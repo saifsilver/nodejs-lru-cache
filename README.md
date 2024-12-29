@@ -1,4 +1,4 @@
-# LRUCacheWithExpiry
+# Node.js Generic LRU Cache with Time-to-Live (TTL) and Automated Expiry
 
 A generic **Least Recently Used (LRU) Cache** implementation with support for:
 
