@@ -1,4 +1,4 @@
-# Node.js Generic LRU Cache with Time-to-Live (TTL) and Automated Expiry
+# Node.js Generic LRU Cache with Time-to-Live (TTL) and Multi-Storage Support
 
 A generic **Least Recently Used (LRU) Cache** implementation with support for:
 
@@ -6,40 +6,66 @@ A generic **Least Recently Used (LRU) Cache** implementation with support for:
 - **Time-to-Live (TTL)**: Items expire and are removed automatically after a specified time.
 - **Automated expiry checking**: Periodic background checks clean up expired items.
 - **Graceful shutdown**: Ensures cleanup of background processes on application exit or interruption.
+- **Multi-Storage Support**: Flexible storage backends including in-memory, file, Redis, and S3.
 
 ## Features
 
 - **Generic Type Support**: Store any type of value in the cache.
 - **Configurable Expiry Check Interval**: Control how frequently the cache checks for expired items.
-- **Optimized for Performance**: Efficient use of `Map` for O(1) get and put operations.
-- **Example Usage Included**: Demonstrates how to use the cache.
+- **Optimized for Performance**: Efficient use of `Map` for O(1) get and put operations in in-memory storage.
+- **Flexible Storage Options**:
+  - **MemoryStorage**: Fast and ephemeral storage in memory.
+  - **FileStorage**: Persistent storage using local files.
+  - **RedisStorage**: Distributed and scalable storage using Redis.
+  - **S3Storage**: Durable and cloud-based storage using AWS S3.
+- **Example Usage Included**: Demonstrates how to use the cache with various storage options.
 
 ## Installation
 
 To use this class in your project:
 
-1. Clone the repository or copy the `LRUCacheWithExpiry.tsx` file.
-2. Import the class into your project:
+1. Clone the repository or copy the `multi_storage_lru_cache.ts` file.
+2. Import the required classes into your project:
    ```typescript
-   import LRUCacheWithExpiry from './LRUCacheWithExpiry';
+   import LRUCacheWithExpiry, { MemoryStorage, FileStorage, RedisStorage, S3Storage } from './multi_storage_lru_cache';
    ```
 
 ## Example Usage
 
+### In-Memory Storage
 ```typescript
-const lruCache = new LRUCacheWithExpiry<string>(3, 5000, 2000); // Capacity: 3 items, TTL: 5 seconds, Expiry check: 2 seconds
+const memoryStorage = new MemoryStorage<string>();
+const lruCache = new LRUCacheWithExpiry<string>(3, 5000, 2000, memoryStorage);
 
-lruCache.put(1, 'A');
-lruCache.put(2, 'B');
-lruCache.put(3, 'C');
+await lruCache.put(1, 'A');
+console.log(await lruCache.get(1)); // Access 1 -> 'A'
+```
 
-console.log(lruCache.get(1)); // Access 1 -> 'A'
+### File Storage
+```typescript
+const fileStorage = new FileStorage<string>('cache.json');
+const lruCache = new LRUCacheWithExpiry<string>(3, 5000, 2000, fileStorage);
 
-setTimeout(() => {
-  console.log(lruCache.get(1)); // Returns -1 (expired after 5 seconds)
-  lruCache.put(4, 'D');         // Add 4 -> 'D'
-  console.log(lruCache.get(2)); // Returns -1 (expired)
-}, 6000);
+await lruCache.put(1, 'A');
+console.log(await lruCache.get(1)); // Access 1 -> 'A'
+```
+
+### Redis Storage
+```typescript
+const redisStorage = new RedisStorage<string>();
+const lruCache = new LRUCacheWithExpiry<string>(3, 5000, 2000, redisStorage);
+
+await lruCache.put(1, 'A');
+console.log(await lruCache.get(1)); // Access 1 -> 'A'
+```
+
+### S3 Storage
+```typescript
+const s3Storage = new S3Storage<string>('my-bucket', 'cache.json');
+const lruCache = new LRUCacheWithExpiry<string>(3, 5000, 2000, s3Storage);
+
+await lruCache.put(1, 'A');
+console.log(await lruCache.get(1)); // Access 1 -> 'A'
 ```
 
 ## Parameters
@@ -50,29 +76,31 @@ setTimeout(() => {
 new LRUCacheWithExpiry<T>(
   capacity: number,
   ttl: number,
-  expiryCheckInterval: number = 1000
+  expiryCheckInterval: number = 1000,
+  storage: CacheStorage<T>
 )
 ```
 
 - **capacity**: Maximum number of items the cache can hold.
 - **ttl**: Time-to-live for each cache item in milliseconds.
 - **expiryCheckInterval** (optional): Interval (in ms) to check for expired items (default: 1000ms).
+- **storage**: A storage backend implementing the `CacheStorage` interface (e.g., `MemoryStorage`, `FileStorage`, etc.).
 
 ### Methods
 
-#### `get(key: string | number): T | -1`
+#### `get(key: string | number): Promise<T | -1>`
 
 - Retrieve the value associated with the given key.
 - Returns `-1` if the key does not exist or has expired.
 
-#### `put(key: string | number, value: T): void`
+#### `put(key: string | number, value: T): Promise<void>`
 
 - Insert or update a value associated with the given key.
 - Evicts the least recently used item if the cache exceeds its capacity.
 
-#### `stopExpiryAutomation(): void`
+#### `stop(): Promise<void>`
 
-- Stops the background expiry automation process.
+- Stops the background expiry automation process and performs cleanup for the storage backend.
 
 ## Contributing
 
@@ -84,6 +112,4 @@ This project is licensed under the MIT License.
 
 ## Author
 
-- **Saif** - Creator of the LRUCacheWithExpiry implementation.
-
-
+- **Saif** - Creator of the Multi-Storage LRU Cache implementation.
