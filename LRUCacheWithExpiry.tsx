@@ -1,3 +1,17 @@
+/**
+ * LRUCacheWithExpiry
+ * 
+ * A generic Least Recently Used (LRU) Cache implementation with support for:
+ * - Capacity-based eviction
+ * - Time-to-Live (TTL)
+ * - Automated expiry checking
+ * - Graceful shutdown
+ * 
+ * Created by Saif <pay.saif@gmail.com>
+ * 
+ * License: MIT
+ */
+
 class LRUCacheWithExpiry<T> {
   /**
    * Constructor for the LRUCacheWithExpiry class.
