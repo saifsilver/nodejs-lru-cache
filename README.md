@@ -1,10 +1,5 @@
 # LRUCacheWithExpiry
 
-## Author
-
-- **Saif** - Creator of the LRUCacheWithExpiry implementation.
-
-
 A generic **Least Recently Used (LRU) Cache** implementation with support for:
 
 - **Capacity-based eviction**: Automatically removes the least recently used items when the cache exceeds its capacity.
@@ -86,5 +81,9 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 ## License
 
 This project is licensed under the MIT License.
+
+## Author
+
+- **Saif** - Creator of the LRUCacheWithExpiry implementation.
 
 
